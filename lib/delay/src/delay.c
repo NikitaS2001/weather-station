@@ -1,36 +1,7 @@
 #include "delay.h"
 
 #define MS_COEFF (SystemCoreClock / 1000)
-#define US_COEFF (SystemCoreClock / 1000000)
-
-// -----------------------------------------------
-// SysTick Delay (only ms)
-// -----------------------------------------------
-#ifdef SYSTICK_DELAY_ENABLE
-
-__IO uint32_t systick_counter = 0;
-
-void SysTick_Init() {
-	SystemCoreClockUpdate();							// Update SystemCoreClock variable
-	SysTick_Config(MS_COEFF);							// 1ms
-}
-
-uint32_t SysTick_millis() {
-	return systick_counter;
-}
-
-void SysTick_delay_ms(uint32_t delay) {
-	uint32_t t0 = SysTick_millis();
-	while ((SysTick_millis() - t0) < delay);
-}
-
-// -----------------------------------------------
-// SysTick Interrupt Handler
-// -----------------------------------------------
-void SysTick_Handler() {
-	systick_counter++;
-}
-#endif
+#define S_COEFF (SystemCoreClock)
 
 // -----------------------------------------------
 // DWT Init
@@ -58,10 +29,10 @@ uint32_t DWT_millis(void) {
 }
 
 // -----------------------------------------------
-// DWT Get Microseconds
+// DWT Get seconds
 // -----------------------------------------------
-uint32_t DWT_micros(void) {
-	return DWT_tick() / US_COEFF;						// tick to us
+uint32_t DWT_s(void) {
+	return DWT_tick() / S_COEFF;						// tick to s
 }
 
 // -----------------------------------------------
@@ -74,10 +45,10 @@ void DWT_delay_ms(uint32_t delay){
 }
 
 // -----------------------------------------------
-// DWT Blocking Delay (us)
+// DWT Blocking Delay (s)
 // -----------------------------------------------
-void DWT_delay_us(uint32_t delay){
-	delay *= US_COEFF;									// us to tick
+void DWT_delay_s(uint32_t delay){
+	delay *= S_COEFF;									// s to tick
 	uint32_t t0 = DWT_tick();
 	while((DWT_tick() - t0) < delay);
 }
@@ -98,9 +69,9 @@ void DWT_nb_delay_ms(Delay_TypeDef *dt, uint32_t delay) {
 }
 
 // -----------------------------------------------
-// DWT Non Blocking Delay (us)
+// DWT Non Blocking Delay (s)
 // -----------------------------------------------
-void DWT_nb_delay_us(Delay_TypeDef *dt, uint32_t delay) {
-	dt->delay = delay * US_COEFF;						// us to tick
+void DWT_nb_delay_ms(Delay_TypeDef *dt, uint32_t delay) {
+	dt->delay = delay * S_COEFF;						// s to tick
 	dt->timestamp = DWT_tick();
 }

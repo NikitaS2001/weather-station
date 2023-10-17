@@ -4,19 +4,20 @@
 
 #define DELAYSTAMP 600'000 // 10 minutes
 
-Delay_TypeDef bme280;
+Delay_TypeDef bme280_delay;
 
 int main(void)
 { 
-    I2C1_Init(I2C_FAST);
     DWT_Init();
+    I2C1_Init(I2C_FAST);
+
 
     for(;;)
     {
-        if (DWT_nb_timeout(&bme280))
+        if (DWT_nb_timeout(&bme280_delay))
         {
             
-            DWT_nb_delay_ms(&bme280, DELAYSTAMP);
+            DWT_nb_delay_ms(&bme280_delay, DELAYSTAMP);
         }
     }
 
