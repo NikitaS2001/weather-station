@@ -29,13 +29,6 @@ uint32_t DWT_millis(void) {
 }
 
 // -----------------------------------------------
-// DWT Get seconds
-// -----------------------------------------------
-uint32_t DWT_s(void) {
-	return DWT_tick() / S_COEFF;						// tick to s
-}
-
-// -----------------------------------------------
 // DWT Blocking Delay (ms)
 // -----------------------------------------------
 void DWT_delay_ms(uint32_t delay){
@@ -65,13 +58,5 @@ uint8_t DWT_nb_timeout(Delay_TypeDef *dt) {
 // -----------------------------------------------
 void DWT_nb_delay_ms(Delay_TypeDef *dt, uint32_t delay) {
 	dt->delay = delay * MS_COEFF;						// ms to tick
-	dt->timestamp = DWT_tick();
-}
-
-// -----------------------------------------------
-// DWT Non Blocking Delay (s)
-// -----------------------------------------------
-void DWT_nb_delay_ms(Delay_TypeDef *dt, uint32_t delay) {
-	dt->delay = delay * S_COEFF;						// s to tick
 	dt->timestamp = DWT_tick();
 }

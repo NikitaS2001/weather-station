@@ -25,11 +25,8 @@ void DWT_Init(void);
 uint32_t DWT_tick(void);
 uint32_t DWT_millis(void);
 void DWT_delay_ms(uint32_t delay);
-void DWT_s(void);
-void DWT_delay_s(uint32_t delay);
 // DWT Non Blocking Delay (ms, s)
 uint8_t DWT_nb_timeout(Delay_TypeDef *dt);
-void DWT_nb_delay_ms(Delay_TypeDef *dt, uint32_t delay);
 void DWT_nb_delay_ms(Delay_TypeDef *dt, uint32_t delay);
 
 
