@@ -1,12 +1,11 @@
 // #include <stm32f1xx.h>
 #include <stm32f103x6.h>
 #include "i2c.h"
+#include "delay.h"
 
 #define DELAYSTAMP 600'000 // 10 minutes
 
-volatile uint32_t timestamp = 600'000;
-
-void SysTick_Handler(void);
+Delay_TypeDef bme280;
 
 int main(void)
 {
@@ -16,17 +15,12 @@ int main(void)
 
     for(;;)
     {
-        if (DELAYSTAMP < timestamp)
+        if (DWT_nb_timeout(&bme280))
         {
             
-            timestamp = 0;
+            DWT_nb_delay_ms(&bme280, DELAYSTAMP);
         }
     }
 
     return 0;
-}
-
-void SysTick_Handler(void) 
-{
-  timestamp++;
 }
