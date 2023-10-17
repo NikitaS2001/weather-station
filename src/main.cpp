@@ -1,5 +1,4 @@
-// #include <stm32f1xx.h>
-#include <stm32f103x6.h>
+#include <stm32f1xx.h>
 #include "i2c.h"
 #include "delay.h"
 
@@ -8,10 +7,9 @@
 Delay_TypeDef bme280;
 
 int main(void)
-{
-    if (SysTick_Config(SystemCoreClock / 1000)) { return 1; }
-    
+{ 
     I2C1_Init(I2C_FAST);
+    DWT_Init();
 
     for(;;)
     {
