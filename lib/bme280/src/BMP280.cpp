@@ -175,7 +175,7 @@ void BMP280_SetRegisterConfig(uint8_t config) {
 // --------------------------------------------------
 // BMP280_Compensate_Temperature
 // --------------------------------------------------
-float BMP280_Compensate_Temperature(int32_t adc_T)
+static inline float BMP280_Compensate_Temperature(int32_t adc_T)
 {
 	int32_t var1, var2, t;
 
@@ -191,7 +191,7 @@ float BMP280_Compensate_Temperature(int32_t adc_T)
 // --------------------------------------------------
 // BMP280_Compensate_Pressure (Pa)
 // --------------------------------------------------
-float BMP280_Compensate_Pressure(int32_t adc_P)
+static inline float BMP280_Compensate_Pressure(int32_t adc_P)
 {
 	int64_t var1, var2, p;
 
@@ -219,7 +219,7 @@ float BMP280_Compensate_Pressure(int32_t adc_P)
 // --------------------------------------------------
 // BMP280_Compensate_Humidity (%)
 // --------------------------------------------------
-float BMP280_Compensate_Humidity(int32_t adc_H)
+static inline float BMP280_Compensate_Humidity(int32_t adc_H)
 {
 	int32_t value;
 
