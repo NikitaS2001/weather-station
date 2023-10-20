@@ -5,7 +5,8 @@
 #include "i2c.h"
 #include "delay.h"
 
-#define SLAVE_ADDRESS_LCD 0x4E
+// #define SLAVE_ADDRESS_LCD 0x4E
+#define SLAVE_ADDRESS_LCD 0x70 << 1
 
 void LCD_Init(void);
 void LCD_SendCmd(char cmd);

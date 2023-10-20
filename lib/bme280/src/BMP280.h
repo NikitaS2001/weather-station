@@ -12,6 +12,7 @@
 #include "delay.h"
 
 #define BMP280_ADDRESS						0x76
+// #define BMP280_ADDRESS						0x77
 
 // Preset Meas for Normal mode
 #define BMP280_PRESET_CTRL_MEAS_NORMAL		(BMP280_CTRL_MEAS_OSRS_T_X16 | BMP280_CTRL_MEAS_OSRS_P_X16 | BMP280_CTRL_MEAS_MODE_NORMAL)
@@ -36,7 +37,6 @@
 #define BMP280_REGISTER_TEMPERATURE_MSB		0xFA
 #define BMP280_REGISTER_TEMPERATURE_LSB		0xFB
 #define BMP280_REGISTER_TEMPERATURE_XLSB	0xFC
-#define BMP280_REGISTER_HUMIDITY_MSB        0xFD
 
 // Compensation parameter storage
 #define BMP280_DIG_T1_LSB					0x88
@@ -63,11 +63,6 @@
 #define BMP280_DIG_P8_MSB					0x9D
 #define BMP280_DIG_P9_LSB					0x9E
 #define BMP280_DIG_P9_MSB					0x9F
-#define BMP280_DIG_H1_LSB					0xA1
-#define BMP280_DIG_H2_LSB					0xE1
-#define BMP280_DIG_H3_LSB					0xE3
-#define BMP280_DIG_H4_5_LSB					0xE4
-#define BMP280_DIG_H6_LSB					0xE7
 
 /* ------------------------------------------------
  * Register 0xF4 "ctrl_meas"
@@ -189,11 +184,11 @@ void BMP280_Init(BMP280_Mode_Type mode);
 void BMP280_Reset();
 void BMP280_SetRegisterCtrlMeas(uint8_t ctrl_meas);
 void BMP280_SetRegisterConfig(uint8_t config);
-float BMP280_GetTemperature();
-float BMP280_GetPressure();
-float BMP280_GetHumidity();
-void BMP280_GetTemperatureAndPressure(float *temperature, float *pressure);
-void BMP280_GetTemperatureAndPressureandHumidity(float *temperature, float *pressure, float *humidity);
-void BMP280_GetTemperatureAndPressureForced(float *temperature, float *pressure);
+double BMP280_Compensate_Temperature(int32_t adc_T);
+double BMP280_Compensate_Pressure(int32_t adc_P);
+double BMP280_GetTemperature();
+double BMP280_GetPressure();
+void BMP280_GetTemperatureAndPressure(double *temperature, double *pressure);
+void BMP280_GetTemperatureAndPressureForced(double *temperature, double *pressure);
 
 #endif /* BMP280_H_ */

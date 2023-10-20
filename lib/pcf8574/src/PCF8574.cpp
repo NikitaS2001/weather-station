@@ -2,7 +2,6 @@
 
 void LCD_Init(void)
 {
-    DWT_delay_ms(50);
     LCD_SendCmd(0x30);
     DWT_delay_ms(5);
     LCD_SendCmd(0x30);
@@ -45,7 +44,7 @@ void LCD_SendCmd(char cmd)
 
 	I2C1_Stop();
     
-    DWT_delay_ms(100);
+    // DWT_delay_ms(100);
 
 }
 

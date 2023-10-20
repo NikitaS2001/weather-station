@@ -1,3 +1,10 @@
+/*
+ * BMP280.c
+ *
+ *  Created on: 04.05.2019
+ *      Author: Admin
+ */
+
 #include "BMP280.h"
 
 uint16_t BMP280_dig_T1;
@@ -12,12 +19,6 @@ int16_t BMP280_dig_P6;
 int16_t BMP280_dig_P7;
 int16_t BMP280_dig_P8;
 int16_t BMP280_dig_P9;
-uint8_t BMP280_dig_H1;
-int16_t BMP280_dig_H2;
-uint8_t BMP280_dig_H3;
-int16_t BMP280_dig_H4;
-int16_t BMP280_dig_H5;
-int8_t BMP280_dig_H6;
 int32_t BMP280_t_fine;
 
 uint8_t BMP280_ReadRegister(uint8_t address) {
@@ -93,7 +94,7 @@ uint8_t BMP280_GetStatus() {
 
 void BMP280_Init(BMP280_Mode_Type mode) {
 
-	uint8_t data[3] = {0};
+	uint8_t data[2] = {0};
 
 	// Temperature compensation related values, (LSB first)
 	BMP280_ReadRegisters(BMP280_DIG_T1_LSB, data, 2);
@@ -133,23 +134,6 @@ void BMP280_Init(BMP280_Mode_Type mode) {
 	BMP280_ReadRegisters(BMP280_DIG_P9_LSB, data, 2);
 	BMP280_dig_P9 = data[1] << 8 | data[0];
 
-	// Humidity compensation related values, (LSB first)
-	BMP280_ReadRegisters(BMP280_DIG_H1_LSB, data, 1);
-	BMP280_dig_H1 = data[0];
-
-	BMP280_ReadRegisters(BMP280_DIG_H2_LSB, data, 2);
-	BMP280_dig_H2 = data[1] << 8 | data[0];
-
-	BMP280_ReadRegisters(BMP280_DIG_H3_LSB, data, 1);
-	BMP280_dig_H3 = data[0];
-
-	BMP280_ReadRegisters(BMP280_DIG_H4_5_LSB, data, 3);
-	BMP280_dig_H4 = data[0] << 4 | (data[1] & 0xF);
-	BMP280_dig_H5 = data[2] << 4 | (data[1] >> 4);
-
-	BMP280_ReadRegisters(BMP280_DIG_H6_LSB, data, 1);
-	BMP280_dig_H6 = data[0];
-
 	// Soft reset
 	// BMP280_Reset();
 
@@ -175,7 +159,7 @@ void BMP280_SetRegisterConfig(uint8_t config) {
 // --------------------------------------------------
 // BMP280_Compensate_Temperature
 // --------------------------------------------------
-static inline float BMP280_Compensate_Temperature(int32_t adc_T)
+double BMP280_Compensate_Temperature(int32_t adc_T)
 {
 	int32_t var1, var2, t;
 
@@ -185,13 +169,13 @@ static inline float BMP280_Compensate_Temperature(int32_t adc_T)
 	BMP280_t_fine = var1 + var2;
 	t = (BMP280_t_fine * 5 + 128) >> 8;
 
-	return (float)t / 100.0;
+	return (double)t / 100.0;
 }
 
 // --------------------------------------------------
 // BMP280_Compensate_Pressure (Pa)
 // --------------------------------------------------
-static inline float BMP280_Compensate_Pressure(int32_t adc_P)
+double BMP280_Compensate_Pressure(int32_t adc_P)
 {
 	int64_t var1, var2, p;
 
@@ -213,32 +197,10 @@ static inline float BMP280_Compensate_Pressure(int32_t adc_P)
 	var2 = ((int64_t)BMP280_dig_P8 * p) >> 19;
 	p = ((p + var1 + var2) >> 8) + ((int64_t)BMP280_dig_P7 << 4);
 
-	return (float)p / 256.0;
+	return (double)p / 256.0;
 }
 
-// --------------------------------------------------
-// BMP280_Compensate_Humidity (%)
-// --------------------------------------------------
-static inline float BMP280_Compensate_Humidity(int32_t adc_H)
-{
-	int32_t value;
-
-	value = BMP280_t_fine - (int32_t) 76800;
-	value = ((((adc_H << 14) - ((int32_t) BMP280_dig_H4 << 20)
-			- ((int32_t) BMP280_dig_H5 * value)) + (int32_t) 16384) >> 15)
-			* (((((((value * (int32_t) BMP280_dig_H6) >> 10)
-					* (((value * (int32_t) BMP280_dig_H3) >> 11)
-							+ (int32_t) 32768)) >> 10) + (int32_t) 2097152)
-					* (int32_t) BMP280_dig_H2 + 8192) >> 14);
-	value = value
-			- (((((value >> 15) * (value >> 15)) >> 7)
-					* (int32_t) BMP280_dig_H1) >> 4);
-	value = value < 0 ? 0 : value;
-	value = value > 419430400 ? 419430400 : value;
-	return (float)(value >> 12) / 1024.0;
-}
-
-float BMP280_GetTemperature() {
+double BMP280_GetTemperature() {
 
 	int32_t adc_T;
 	uint8_t data[3] = {0};
@@ -250,7 +212,7 @@ float BMP280_GetTemperature() {
 	return BMP280_Compensate_Temperature(adc_T);
 }
 
-float BMP280_GetPressure() {
+double BMP280_GetPressure() {
 
 	int32_t adc_P;
 	uint8_t data[3] = {0};
@@ -262,19 +224,7 @@ float BMP280_GetPressure() {
 	return BMP280_Compensate_Pressure(adc_P);
 }
 
-float BMP280_GetHumidity()
-{
-	int32_t adc_H;
-	uint8_t data[3] = {0};
-
-	BMP280_ReadRegisters(BMP280_REGISTER_HUMIDITY_MSB, data, 3);
-
-	adc_H = (int32_t)((data[0] << 12) | (data[1] << 4) | (data[2] >> 4));
-
-	return BMP280_Compensate_Humidity(adc_H);
-}
-
-void BMP280_GetTemperatureAndPressure(float *temperature, float *pressure) {
+void BMP280_GetTemperatureAndPressure(double *temperature, double *pressure) {
 
 	int32_t adc_T, adc_P;
 	uint8_t data[6] = {0};
@@ -288,22 +238,7 @@ void BMP280_GetTemperatureAndPressure(float *temperature, float *pressure) {
 	*pressure = BMP280_Compensate_Pressure(adc_P);
 }
 
-void BMP280_GetTemperatureAndPressureandHumidity(float *temperature, float *pressure, float *humidity)
-{
-	int32_t adc_T, adc_P, adc_H;
-	uint8_t data[9] = {0};
-
-	adc_P = (int32_t)((data[0] << 12) | (data[1] << 4) | (data[2] >> 4));
-	adc_T = (int32_t)((data[3] << 12) | (data[4] << 4) | (data[5] >> 4));
-	adc_H = (int32_t)((data[6] << 12) | (data[7] << 4) | (data[8] >> 4));
-
-	*temperature = BMP280_Compensate_Temperature(adc_T);
-	*pressure = BMP280_Compensate_Pressure(adc_P);
-	*humidity = BMP280_Compensate_Humidity(adc_H);
-}
-
-void BMP280_GetTemperatureAndPressureForced(float *temperature, float *pressure)
-{
+void BMP280_GetTemperatureAndPressureForced(double *temperature, double *pressure) {
 
 	// 20bit, Forced mode, 125ms, filter 2
 	BMP280_SetRegisterConfig(BMP280_PRESET_CONFIG);
