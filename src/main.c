@@ -4,6 +4,7 @@
 #define BME280_ADDRESS 0x76
 
 I2C_HandleTypeDef hi2c1;
+Delay delay;
 
 uint16_t dig_T1;
 int16_t dig_T2;
@@ -51,9 +52,12 @@ int main(void)
 
     while (1)
     {
-        HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-        BME280_Read_All(&t, &p, &h);
-        HAL_Delay(1000);
+        if (Delay_nb_timeout(&delay))
+        {
+            HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+            BME280_Read_All(&t, &p, &h);
+            Delay_nb_ms(&delay, 1000);
+        }
 
     }
     }
