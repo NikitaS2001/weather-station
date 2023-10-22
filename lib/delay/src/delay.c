@@ -7,7 +7,7 @@ void Delay_nb_ms(Delay *dt, uint32_t delay)
     dt->timestamp = HAL_GetTick();
 }
 
-bool Delay_nb_timeout(Delay *dt)
+int8_t Delay_nb_timeout(Delay *dt)
 {
-    return (bool)((HAL_GetTick() - dt->timestamp) > dt->delay);
+    return (int8_t)((HAL_GetTick() - dt->timestamp) > dt->delay);
 }

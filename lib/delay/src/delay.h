@@ -1,12 +1,15 @@
-#pragma once
+#ifndef __DELAY_H__
+#define __DELAY_H__
 
 #include <stm32f1xx_hal.h>
 
 typedef struct
 {
-    uint32_t delay = 0;
-    uint32_t timestamp = 0;
+    uint32_t delay;
+    uint32_t timestamp;
 } Delay;
 
 void Delay_nb_ms(Delay *dt, uint32_t delay);
-bool Delay_nb_timeout(Delay *dt);
+int8_t Delay_nb_timeout(Delay *dt);
+
+#endif /* __DELAY_H__ */
