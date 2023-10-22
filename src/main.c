@@ -209,7 +209,9 @@ void BME280_Read_All(float *t, float *p, float *h)
 {
 
 
-    int32_t adc_T, adc_P, adc_H;
+    int32_t adc_T = 0;
+    int32_t adc_P = 0;
+    int32_t adc_H = 0;
 	uint8_t buf[8];
 
     i2c_read(BME280_ADDRESS, 0xF7, buf, 8);
