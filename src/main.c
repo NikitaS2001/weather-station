@@ -11,30 +11,30 @@ static void MX_I2C1_Init(void);
 
 float temp, press, hum;
 
-    int main(void)
+int main(void)
+{
+    HAL_Init();
+    SystemClock_Config();
+    MX_GPIO_Init();
+    MX_I2C1_Init();
+    BME280_Init(OSRS_2, OSRS_16, OSRS_1, MODE_NORMAL, T_SB_0p5, IIR_16);
+    
+    while (1)
     {
-        HAL_Init();
-        SystemClock_Config();
-        MX_GPIO_Init();
-        MX_I2C1_Init();
-        BME280_Init(OSRS_2, OSRS_16, OSRS_1, MODE_NORMAL, T_SB_0p5, IIR_16);
-        
-        while (1)
+        if (Delay_nb_timeout(&delay))
         {
-            if (Delay_nb_timeout(&delay))
-            {
-                BME280_Read_All(&temp, &press, &hum);
-                Delay_nb_ms(&delay, MINUTES_10);
-            }
+            BME280_Read_All(&temp, &press, &hum);
+            Delay_nb_ms(&delay, 1000);
         }
     }
+}
 
 /**
   * @brief System Clock Configuration
   * @retval None
   */
 void SystemClock_Config(void)
-{
+{   
 	RCC_OscInitTypeDef RCC_OscInitStruct = {0};
 	RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 

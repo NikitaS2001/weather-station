@@ -32,7 +32,7 @@ static void ReadCalibrationData(void)
 	HAL_I2C_Mem_Read(BME280_I2C, BME280_ADDRESS_SHIFT, 0x88, 1, buf, 25, HAL_MAX_DELAY);
 
 	// Read mem from 0xE1 to 0xE7
-	HAL_I2C_Mem_Read(BME280_I2C, BME280_ADDRESS_SHIFT, 0xE1, 1, (uint8_t*)buf+25, 7, HAL_MAX_DELAY);
+	HAL_I2C_Mem_Read(BME280_I2C, BME280_ADDRESS_SHIFT, 0xE1, 1, (uint8_t*)buf+25, 8, HAL_MAX_DELAY);
 
 	dig_T1 = buf[0] | (buf[1] << 8);
 	dig_T2 = buf[2] | (buf[3] << 8); 
@@ -113,7 +113,7 @@ int8_t BME280_Init (uint8_t osrs_t, uint8_t osrs_p, uint8_t osrs_h, uint8_t mode
 	return 0;
 }
 
-int BMEReadRaw(void)
+int BME280_Read_Raw()
 {
 	uint8_t RawData[8];
 
@@ -173,6 +173,8 @@ uint32_t bme280_compensate_H(int32_t adc_H)
 
 void BME280_Read_All (float *temp, float *press, float *hum)
 {
+    BME280_Read_Raw();
+
 	*temp = (float)(BME280_compensate_T(tRaw)) / 100.0;
 	*press = (float)(BME280_compensate_P(pRaw)) / 256.0;
 	*hum = (float)(bme280_compensate_H(hRaw)) / 1024.0;
