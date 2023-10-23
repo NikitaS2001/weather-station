@@ -3,6 +3,7 @@
 
 #include <stm32f1xx_hal.h>
 
+#define MINUTES_10 600000
 typedef struct
 {
     uint32_t delay;

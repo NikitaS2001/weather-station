@@ -4,7 +4,8 @@
 #include "stm32f1xx_hal.h"
 
 int8_t BME280_Init(uint8_t osrs_t, uint8_t osrs_p, uint8_t osrs_h, uint8_t mode, uint8_t t_sb, uint8_t filter);
-void BME280_Read_All(void);
+// void BME280_Read_All(void);
+inline void BME280_Read_All(float *t, float *p, float *h);
 
 // Address sensor
 #define BME280_ADDRESS 0x76

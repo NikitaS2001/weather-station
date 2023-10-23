@@ -3,8 +3,6 @@
 extern I2C_HandleTypeDef hi2c1;
 #define BME280_I2C &hi2c1
 
-extern float Temperature, Pressure, Humidity;
-
 int32_t tRaw, pRaw, hRaw;
 
 uint16_t dig_T1;
@@ -129,17 +127,17 @@ int BMEReadRaw(void)
 	return 0;
 }
 
-static int32_t BME280_compensate_T(int32_t adc_T)
+int32_t BME280_compensate_T(int32_t adc_T)
 {
 	int32_t var1, var2, T;
 	var1 = ((((adc_T >> 3) - ((int32_t)dig_T1 << 1))) * ((int32_t)dig_T2))  >>  11;
 	var2 = (((((adc_T >> 4) - ((int32_t)dig_T1)) * ((adc_T >> 4) - ((int32_t)dig_T1))) >> 12) *((int32_t)dig_T3))  >>  14;
 	t_fine = var1 + var2;
-	T = (t_fine * 5 + 128)  >>  8;
+	T = (t_fine * 5 + 128) >> 8;
 	return T;
 }
 
-static uint32_t BME280_compensate_P(int32_t adc_P)
+uint32_t BME280_compensate_P(int32_t adc_P)
 {
 	int64_t var1, var2, p;
 	var1 = ((int64_t)t_fine) - 128000;
@@ -157,7 +155,7 @@ static uint32_t BME280_compensate_P(int32_t adc_P)
 	return (uint32_t)p;
 }
 
-static uint32_t bme280_compensate_H(int32_t adc_H)
+uint32_t bme280_compensate_H(int32_t adc_H)
 {
 	int32_t v_x1_u32r;
 	v_x1_u32r = (t_fine - ((int32_t)76800));
@@ -173,9 +171,9 @@ static uint32_t bme280_compensate_H(int32_t adc_H)
 	return (uint32_t)(v_x1_u32r >> 12);
 }
 
-void BME280_Read_All (void)
+void BME280_Read_All (float *temp, float *press, float *hum)
 {
-	Temperature = (float)(BME280_compensate_T(tRaw)) / 100.0;
-	Pressure = (float)(BME280_compensate_P(pRaw)) / 256.0;
-	Humidity = (float)(bme280_compensate_H(hRaw)) / 1024.0;
+	*temp = (float)(BME280_compensate_T(tRaw)) / 100.0;
+	*press = (float)(BME280_compensate_P(pRaw)) / 256.0;
+	*hum = (float)(bme280_compensate_H(hRaw)) / 1024.0;
 }

@@ -9,7 +9,7 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_I2C1_Init(void);
 
-float Temperature, Pressure, Humidity;
+float temp, press, hum;
 
     int main(void)
     {
@@ -23,8 +23,8 @@ float Temperature, Pressure, Humidity;
         {
             if (Delay_nb_timeout(&delay))
             {
-                BME280_Read_All();
-                Delay_nb_ms(&delay, 500);
+                BME280_Read_All(&temp, &press, &hum);
+                Delay_nb_ms(&delay, MINUTES_10);
             }
         }
     }
