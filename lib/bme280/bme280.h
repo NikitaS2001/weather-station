@@ -3,9 +3,12 @@
 
 #include "stm32f1xx_hal.h"
 
-int8_t BME280_Init (uint8_t osrs_t, uint8_t osrs_p, uint8_t osrs_h, uint8_t mode, uint8_t t_sb, uint8_t filter);
+int8_t BME280_Init(uint8_t osrs_t, uint8_t osrs_p, uint8_t osrs_h, uint8_t mode, uint8_t t_sb, uint8_t filter);
 void BME280_Read_All(void);
 
+// Address sensor
+#define BME280_ADDRESS 0x76
+#define BME280_ADDRESS_SHIFT 0xEC // 0x76 << 1
 
 // Oversampling definitions
 #define OSRS_OFF       0x00
@@ -46,6 +49,5 @@ void BME280_Read_All(void);
 #define CTRL_MEAS_REG  0xF4
 #define CONFIG_REG     0xF5
 #define PRESS_MSB_REG  0xF7
-
 
 #endif /* BME280_H_ */
