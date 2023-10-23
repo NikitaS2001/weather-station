@@ -171,10 +171,31 @@ int8_t i2c_read(uint8_t addr, uint8_t reg, uint8_t *data, uint16_t size_data)
 
 int8_t BME280_init(void)
 {
+    // soft reset
+    uint8_t data_write = 0xB6;
+    HAL_I2C_Mem_Write(&hi2c1, BME280_ADDRESS, 0xE0, 1, &data_write, 1, 1000);
+    HAL_Delay(100);
+
+    // write the humidity oversampling to 0xF2
+    data_write = 0x01;
+    HAL_I2C_Mem_Write(&hi2c1, BME280_ADDRESS, 0xF2, 1, &data_write, 1, 1000);
+    HAL_Delay(100);
+
+    // write the standby time and IIR filter coeff to 0xF5
+    data_write = ((0x03 << 5) | (0x04 << 2));
+    HAL_I2C_Mem_Write(&hi2c1, BME280_ADDRESS, 0xF5, 1, &data_write, 1, 1000);
+    HAL_Delay(100);
+
+    // write the pressure and temp oversampling along with mode to 0xF4
+    data_write = ((0x03 << 5) | (0x02 << 2) | (0x03));
+    HAL_I2C_Mem_Write(&hi2c1, BME280_ADDRESS, 0xF4, 1, &data_write, 1, 1000);
+    HAL_Delay(100);
+
     uint8_t buf[25] = {0};
     int16_t dig_H4_msb, dig_H4_lsb, dig_H5_msb, dig_H5_lsb;
 
     i2c_read(BME280_ADDRESS, 0x88, buf, 25);
+    // HAL_I2C_Mem_Read(&hi2c1, BME280_ADDRESS, 0x88, 1, buf, 25, 1000);
     dig_T1 = (buf[0] | (buf[1] << 8));
     dig_T2 = (buf[2] | (buf[3] << 8));
     dig_T3 = (buf[4] | (buf[5] << 8));
@@ -189,7 +210,8 @@ int8_t BME280_init(void)
     dig_P9 = (buf[22] | (buf[23] << 8));
     dig_H1 = buf[24];
 
-    i2c_read(BME280_ADDRESS, 0xE1, buf, 8);
+    // i2c_read(BME280_ADDRESS, 0xE1, buf, 8);
+    HAL_I2C_Mem_Read(&hi2c1, BME280_ADDRESS, 0xE1, 1, buf, 8, 1000);
     dig_H2 = (buf[0] | (buf[1] << 8));
     dig_H3 = buf[2];
 
@@ -214,7 +236,8 @@ void BME280_Read_All(float *t, float *p, float *h)
     int32_t adc_H = 0;
 	uint8_t buf[8];
 
-    i2c_read(BME280_ADDRESS, 0xF7, buf, 8);
+    // i2c_read(BME280_ADDRESS, 0xF7, buf, 8);
+    HAL_I2C_Mem_Read(&hi2c1, BME280_ADDRESS, 0xF7, 1, buf, 8, 1000);
 
     adc_P = (int32_t)((buf[0] << 12) | (buf[1] << 4) | (buf[2] >> 4));
     adc_T = (int32_t)((buf[3] << 12) | (buf[4] << 4) | (buf[5] >> 4));
