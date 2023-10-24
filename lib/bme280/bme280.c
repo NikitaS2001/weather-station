@@ -1,10 +1,12 @@
 #include "bme280.h"
 
 extern I2C_HandleTypeDef hi2c1;
-Calibration_Data calib;
 #define BME280_I2C &hi2c1
 
-int32_t tRaw, pRaw, hRaw;
+Calibration_Data calib;
+Raw_Data raw;
+
+// int32_t tRaw, pRaw, hRaw;
 
 static void ReadCalibrationData(void)
 {
@@ -45,36 +47,36 @@ int8_t BME280_Config(BME280_HandleTypeDef *bme280)
 	// Reset the device
 	datatowrite = 0xB6;  // reset sequence
 	HAL_I2C_Mem_Write(BME280_I2C, BME280_ADDRESS_SHIFT, RESET_REG, 1, &datatowrite, 1, 1000);
-	HAL_Delay (100);
+	HAL_Delay(100);
 
 	// write the humidity oversampling to 0xF2
 	datatowrite = bme280->Oversampling_h;
 	HAL_I2C_Mem_Write(BME280_I2C, BME280_ADDRESS_SHIFT, CTRL_HUM_REG, 1, &datatowrite, 1, 1000);
-	HAL_Delay (100);
+	HAL_Delay(100);
 
 	// write the standby time and IIR filter coeff to 0xF5
 	datatowrite = (bme280->Standby_Time << 5) | (bme280->Filter_Coef << 2);
 	HAL_I2C_Mem_Write(BME280_I2C, BME280_ADDRESS_SHIFT, CONFIG_REG, 1, &datatowrite, 1, 1000);
-	HAL_Delay (100);
+	HAL_Delay(100);
 
 	// write the pressure and temp oversampling along with mode to 0xF4
 	datatowrite = (bme280->Oversampling_t << 5) | (bme280->Oversampling_p << 2) | bme280->Mode;
 	HAL_I2C_Mem_Write(BME280_I2C, BME280_ADDRESS_SHIFT, CTRL_MEAS_REG, 1, &datatowrite, 1, 1000);
-	HAL_Delay (100);
+	HAL_Delay(100);
 
 	return 0;
 }
 
 int BME280_Read_Raw()
 {
-	uint8_t RawData[8];
+	uint8_t buf[8];
 
 	// Read the Registers 0xF7 to 0xFE
-	HAL_I2C_Mem_Read(BME280_I2C, BME280_ADDRESS_SHIFT, PRESS_MSB_REG, 1, RawData, 8, HAL_MAX_DELAY);
+	HAL_I2C_Mem_Read(BME280_I2C, BME280_ADDRESS_SHIFT, PRESS_MSB_REG, 1, buf, 8, HAL_MAX_DELAY);
 
-	pRaw = (RawData[0] << 12) | (RawData[1] << 4) | (RawData[2]  >>  4);
-	tRaw = (RawData[3] << 12) | (RawData[4] << 4) | (RawData[5]  >>  4);
-	hRaw = (RawData[6] << 8) | (RawData[7]);
+	raw.p = (buf[0] << 12) | (buf[1] << 4) | (buf[2]  >>  4);
+	raw.t = (buf[3] << 12) | (buf[4] << 4) | (buf[5]  >>  4);
+	raw.h = (buf[6] << 8) | (buf[7]);
 
 	return 0;
 }
@@ -127,7 +129,7 @@ void BME280_Read_All (float *temp, float *press, float *hum)
 {
     BME280_Read_Raw();
 
-	*temp = (float)(BME280_compensate_T(tRaw)) / 100.0;
-	*press = (float)(BME280_compensate_P(pRaw)) / 256.0;
-	*hum = (float)(bme280_compensate_H(hRaw)) / 1024.0;
+	*temp = (float)(BME280_compensate_T(raw.t)) / 100.0;
+	*press = (float)(BME280_compensate_P(raw.p)) / 256.0;
+	*hum = (float)(bme280_compensate_H(raw.h)) / 1024.0;
 }

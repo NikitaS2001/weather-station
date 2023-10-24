@@ -5,6 +5,14 @@
 
 typedef struct 
 {
+    int32_t t;
+    int32_t p;
+    int32_t h;
+} Raw_Data;
+
+typedef struct 
+{
+    I2C_HandleTypeDef *i2c;
     uint8_t Oversampling_t;
     uint8_t Oversampling_p;
     uint8_t Oversampling_h;
@@ -15,7 +23,7 @@ typedef struct
 
 // Address sensor
 #define BME280_ADDRESS 0x76
-#define BME280_ADDRESS_SHIFT 0xEC // 0x76 << 1
+#define BME280_ADDRESS_SHIFT (BME280_ADDRESS << 1) //0xEC // 0x76 << 1
 
 // Oversampling definitions
 #define OSRS_OFF       0x00
