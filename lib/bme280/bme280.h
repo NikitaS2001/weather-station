@@ -3,9 +3,15 @@
 
 #include "stm32f1xx_hal.h"
 
-int8_t BME280_Init(uint8_t osrs_t, uint8_t osrs_p, uint8_t osrs_h, uint8_t mode, uint8_t t_sb, uint8_t filter);
-// void BME280_Read_All(void);
-inline void BME280_Read_All(float *t, float *p, float *h);
+typedef struct 
+{
+    uint8_t Oversampling_t;
+    uint8_t Oversampling_p;
+    uint8_t Oversampling_h;
+    uint8_t Mode;
+    uint8_t Standby_Time;
+    uint8_t Filter_Coef;
+} BME280_HandleTypeDef;
 
 // Address sensor
 #define BME280_ADDRESS 0x76
@@ -50,5 +56,31 @@ inline void BME280_Read_All(float *t, float *p, float *h);
 #define CTRL_MEAS_REG  0xF4
 #define CONFIG_REG     0xF5
 #define PRESS_MSB_REG  0xF7
+
+typedef struct
+{
+    uint16_t dig_T1;
+    int16_t dig_T2;
+    int16_t dig_T3;
+    uint16_t dig_P1;
+    int16_t dig_P2;
+    int16_t dig_P3;
+    int16_t dig_P4;
+    int16_t dig_P5;
+    int16_t dig_P6;
+    int16_t dig_P7;
+    int16_t dig_P8;
+    int16_t dig_P9;
+    uint8_t dig_H1;
+    int16_t dig_H2;
+    uint8_t dig_H3;
+    int16_t dig_H4;
+    int16_t dig_H5;
+    int8_t dig_H6;
+    int32_t t_fine;
+} Calibration_Data;
+
+int8_t BME280_Config(BME280_HandleTypeDef *TypeDef);
+void BME280_Read_All(float *t, float *p, float *h);
 
 #endif /* BME280_H_ */

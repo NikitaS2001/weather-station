@@ -3,11 +3,13 @@
 #include "BME280.h"
 
 I2C_HandleTypeDef hi2c1;
+BME280_HandleTypeDef bme280;
 Delay delay;
 
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_I2C1_Init(void);
+static void BME280_Init(void);
 
 float temp, press, hum;
 
@@ -17,8 +19,8 @@ int main(void)
     SystemClock_Config();
     MX_GPIO_Init();
     MX_I2C1_Init();
-    BME280_Init(OSRS_2, OSRS_16, OSRS_1, MODE_NORMAL, T_SB_0p5, IIR_16);
-    
+	BME280_Init();
+        
     while (1)
     {
         if (Delay_nb_timeout(&delay))
@@ -113,9 +115,17 @@ static void MX_GPIO_Init(void)
 	__HAL_RCC_GPIOB_CLK_ENABLE();
 }
 
-/* USER CODE BEGIN 4 */
+static void BME280_Init(void)
+{
+	bme280.Oversampling_t = OSRS_2;
+	bme280.Oversampling_p = OSRS_16;
+	bme280.Oversampling_h = OSRS_1;
+	bme280.Mode = MODE_NORMAL;
+	bme280.Standby_Time = T_SB_0p5;
+	bme280.Filter_Coef = IIR_16;
 
-/* USER CODE END 4 */
+	BME280_Config(&bme280);
+}
 
 /**
   * @brief  This function is executed in case of error occurrence.
