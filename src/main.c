@@ -23,7 +23,7 @@ int main(void)
     MX_I2C1_Init();
 	BME280_Init();
     LCD_Init();
-    LCD_SendString("string");
+    LCD_SendString("Hello Word");
 
     while (1)
     {

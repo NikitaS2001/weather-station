@@ -4,8 +4,7 @@
 #include <stm32f1xx_hal.h>
 
 int8_t LCD_Config(void);
-void LCD_SendCommand(uint8_t cmd);
+void LCD_Send(uint8_t cmd, uint8_t flags);
 void LCD_SendString(char *str);
-void LCD_SendData(uint8_t data);
 
 #endif /* __LCD1602_H__ */
